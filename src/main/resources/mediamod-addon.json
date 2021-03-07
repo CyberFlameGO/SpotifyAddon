@@ -1,0 +1,9 @@
+{
+  "addons": {
+    "mediamod-spotify": {
+      "addonClass": "com.mediamod.addons.spotify.SpotifyAddon",
+      "displayName": "Spotify Addon",
+      "apiVersion": 1
+    }
+  }
+}

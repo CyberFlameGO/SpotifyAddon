@@ -62,6 +62,11 @@ dependencies {
         changing = true
     }
 
+    embed("com.github.jkcclemens:khttp:-SNAPSHOT")
+    embed('com.github.dreamhopping:Kotify:main-SNAPSHOT') {
+        changing = true
+    }
+
     // If you wish to include a dependency in your jar use the "embed" method
     // embed 'com.example:ExampleDependency:1.0-SNAPSHOT'
 }

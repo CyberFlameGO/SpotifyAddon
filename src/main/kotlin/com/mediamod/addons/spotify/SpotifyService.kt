@@ -21,6 +21,7 @@ package com.mediamod.addons.spotify
 
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
+import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
 
 /**
  * The service for the Spotify addon for MediaMod
@@ -28,6 +29,8 @@ import com.mediamod.core.track.TrackMetadata
  * @author Conor Byrne (dreamhopping)
  */
 class SpotifyService : MediaModService("spotify-addon-service") {
+    private var currentTrack: KotifyUserCurrentTrack? = null
+
     /**
      * Called when MediaMod wants to get a [TrackMetadata] instance from you
      * This is called every 3 seconds to avoid rate limits if you are using an API
@@ -35,15 +38,26 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      *
      * @return null if there is no TrackMetadata available
      */
-    override fun fetchTrackMetadata() = TrackMetadata("My Track", "My Artist")
+    override fun fetchTrackMetadata(): TrackMetadata? {
+        val trackItem = currentTrack?.item ?: return null
+
+        return TrackMetadata(
+            trackItem.name ?: "Unknown Track",
+            trackItem.artists?.get(0)?.name ?: "Unknown Artist",
+            currentTrack?.progressMs ?: 0,
+            trackItem.durationMs ?: 0,
+            trackItem.album?.images?.get(0)?.url
+        )
+    }
 
     /**
-     * Called when MediaMod is querying your service to check if it is ready to provide track information
-     * You should NOT do any network operations on this call
-     *
+     * Called when MediaMod is querying your service to check if it is ready to provide track information*
      * @return true if you are ready to return [TrackMetadata], otherwise false
      */
-    override fun hasTrackMetadata() = true
+    override fun hasTrackMetadata(): Boolean {
+        currentTrack = SpotifyAddon.kotify.api.user.fetchCurrentTrack()
+        return currentTrack?.isPlaying ?: false
+    }
 
     /**
      * Called when your service is being registered

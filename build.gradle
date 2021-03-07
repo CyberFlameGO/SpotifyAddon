@@ -58,13 +58,16 @@ configurations {
 dependencies {
     // Don't remove these, they are required by MediaMod!
     compileOnly 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
-    compileOnly ('com.github.MediaModMC:MediaMod:rewrite-SNAPSHOT') {
-        changing = true
+    compileOnly 'com.github.MediaModMC:MediaMod:rewrite-SNAPSHOT'
+
+    embed("com.github.jkcclemens:khttp:-SNAPSHOT") {
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "org.jetbrains.kotlinx"
     }
 
-    embed("com.github.jkcclemens:khttp:-SNAPSHOT")
     embed('com.github.dreamhopping:Kotify:main-SNAPSHOT') {
-        changing = true
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "org.jetbrains.kotlinx"
     }
 
     // If you wish to include a dependency in your jar use the "embed" method
@@ -74,12 +77,6 @@ dependencies {
 shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = [project.configurations.embed]
-
-    /**
-     * It is not recommended to change these relocation settings, if you do your addon may not work!
-     */
-    relocate "kotlin", "mediamod.kotlin"
-    relocate "kotlinx", "mediamod.kotlinx"
 }
 
 configurations.all {

@@ -8,7 +8,7 @@ import java.io.File
 
 object Configuration : Vigilant(
     File(MediaModCore.addonConfigDirectory, "mediamod-spotify.toml"),
-    "Spotify Integrartion"
+    "Spotify"
 ) {
     @Property(
         type = PropertyType.CHECKBOX, name = "Auto refresh",

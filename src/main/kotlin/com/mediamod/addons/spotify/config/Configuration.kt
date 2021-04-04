@@ -7,7 +7,7 @@ import com.mediamod.core.MediaModCore
 import java.io.File
 
 object Configuration : Vigilant(
-    File(MediaModCore.addonConfigDirectory, "mediamod-spotify.json"),
+    File(MediaModCore.addonConfigDirectory, "mediamod-spotify.toml"),
     "Spotify Integrartion"
 ) {
     @Property(

@@ -19,9 +19,11 @@
 
 package com.mediamod.addons.spotify
 
+import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
 import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
+import dev.dreamhopping.kotify.kotify
 
 /**
  * The service for the Spotify addon for MediaMod
@@ -30,6 +32,12 @@ import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
  */
 class SpotifyService : MediaModService("spotify-addon-service") {
     private var currentTrack: KotifyUserCurrentTrack? = null
+    private val kotify = kotify {
+        credentials {
+            accessToken = Configuration.accessToken
+            refreshToken = Configuration.refreshToken
+        }
+    }
 
     /**
      * Called when MediaMod wants to get a [TrackMetadata] instance from you
@@ -55,7 +63,7 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * @return true if you are ready to return [TrackMetadata], otherwise false
      */
     override fun hasTrackMetadata(): Boolean {
-        currentTrack = SpotifyAddon.kotify.api.user.fetchCurrentTrack()
+        currentTrack = kotify.api.user.fetchCurrentTrack()
         return currentTrack?.isPlaying ?: false
     }
 
@@ -65,6 +73,6 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * Once this method is complete, your service needs to be ready to use
      */
     override fun initialise() {
-        // TODO: Load access token & refresh token, refresh access token if required
+
     }
 }

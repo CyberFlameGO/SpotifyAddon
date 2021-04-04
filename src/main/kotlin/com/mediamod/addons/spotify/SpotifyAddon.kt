@@ -23,27 +23,12 @@ import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.addon.MediaModAddon
 import com.mediamod.core.config.MediaModConfigRegistry
 import com.mediamod.core.service.MediaModServiceRegistry
-import dev.dreamhopping.kotify.Kotify
-import dev.dreamhopping.kotify.kotify
 
 /**
  * The addon class for the Spotify Addon for MediaMod
  * @author Conor Byrne (dreamhopping)
  */
 class SpotifyAddon : MediaModAddon("mediamod-spotify") {
-    companion object {
-        private var accessToken: String? = null
-        private var refreshToken: String? = null
-
-        val kotify: Kotify
-            get() = kotify {
-                credentials {
-                    accessToken = this@Companion.accessToken
-                    refreshToken = this@Companion.refreshToken
-                }
-            }
-    }
-
     /**
      * Called when MediaMod is initialising your addon
      * The addon should be ready for usage when this method is complete

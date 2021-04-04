@@ -28,14 +28,14 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id "org.jetbrains.kotlin.jvm" version "1.4.31"
+    id "com.github.johnrengelman.shadow" version "4.0.4"
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: "net.minecraftforge.gradle.forge"
 
-group 'com.mediamod.addons.spotify'
-version '1.0-SNAPSHOT'
+group "com.mediamod.addons.spotify"
+version "1.0-SNAPSHOT"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
@@ -47,7 +47,7 @@ minecraft {
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
+    maven { url "https://jitpack.io" }
 }
 
 configurations {
@@ -56,22 +56,25 @@ configurations {
 }
 
 dependencies {
-    // Don't remove these, they are required by MediaMod!
-    compileOnly 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
-    compileOnly 'com.github.MediaModMC:MediaMod:rewrite-SNAPSHOT'
+    // Gson is included in Minecraft, the addon uses this for parsing responses from Spotify
+    compileOnly("com.google.code.gson:gson:2.8.6")
 
     embed("com.github.jkcclemens:khttp:-SNAPSHOT") {
         exclude group: "org.jetbrains.kotlin"
         exclude group: "org.jetbrains.kotlinx"
     }
 
-    embed('com.github.dreamhopping:Kotify:main-SNAPSHOT') {
+    embed("com.github.dreamhopping:Kotify:main-SNAPSHOT") {
         exclude group: "org.jetbrains.kotlin"
         exclude group: "org.jetbrains.kotlinx"
     }
 
+    compileOnly("com.github.MediaModMC:MediaMod:0ed84e99f1") {
+        changing = true
+    }
+
     // If you wish to include a dependency in your jar use the "embed" method
-    // embed 'com.example:ExampleDependency:1.0-SNAPSHOT'
+    // embed "com.example:ExampleDependency:1.0-SNAPSHOT"
 }
 
 shadowJar {
@@ -81,7 +84,7 @@ shadowJar {
 
 configurations.all {
     // Check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
 }
 
 tasks.build.finalizedBy tasks.shadowJar

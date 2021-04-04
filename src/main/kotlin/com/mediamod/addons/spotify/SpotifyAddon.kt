@@ -19,7 +19,9 @@
 
 package com.mediamod.addons.spotify
 
+import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.addon.MediaModAddon
+import com.mediamod.core.config.MediaModConfigRegistry
 import com.mediamod.core.service.MediaModServiceRegistry
 import dev.dreamhopping.kotify.Kotify
 import dev.dreamhopping.kotify.kotify
@@ -48,15 +50,6 @@ class SpotifyAddon : MediaModAddon("mediamod-spotify") {
      */
     override fun initialise() {
         MediaModServiceRegistry.registerService(identifier, SpotifyService())
-
-        // TODO: Load access and refresh token
-    }
-
-    /**
-     * Called when MediaMod is unloading your addon
-     * The addon should do any configuration saving, etc. in this method
-     */
-    override fun unload() {
-        // TODO: Save access & refresh token
+        MediaModConfigRegistry.registerConfig(identifier, Configuration)
     }
 }

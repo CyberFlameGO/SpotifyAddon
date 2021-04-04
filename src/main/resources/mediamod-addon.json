@@ -1,9 +1,7 @@
 {
-  "addons": {
-    "mediamod-spotify": {
-      "addonClass": "com.mediamod.addons.spotify.SpotifyAddon",
-      "displayName": "Spotify Addon",
-      "apiVersion": 1
-    }
+  "mediamod-spotify": {
+    "name": "Spotify",
+    "description": "Adds support for Spotify in MediaMod",
+    "class": "com.mediamod.addons.spotify.SpotifyAddon"
   }
 }

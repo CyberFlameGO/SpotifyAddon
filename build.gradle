@@ -58,20 +58,12 @@ configurations {
 
 dependencies {
     // Gson is included in Minecraft, the addon uses this for parsing responses from Spotify
-    compileOnly("com.google.code.gson:gson:2.8.6")
+    compileOnly "com.google.code.gson:gson:2.8.6"
+    compileOnly "com.github.MediaModMC:MediaMod:0ed84e99f1"
 
-    embed("com.github.jkcclemens:khttp:-SNAPSHOT") {
-        exclude group: "org.jetbrains.kotlin"
-        exclude group: "org.jetbrains.kotlinx"
-    }
-
+    embed "com.github.jkcclemens:khttp:-SNAPSHOT"
     embed("com.github.dreamhopping:Kotify:main-SNAPSHOT") {
         exclude group: "org.jetbrains.kotlin"
-        exclude group: "org.jetbrains.kotlinx"
-    }
-
-    compileOnly("com.github.MediaModMC:MediaMod:0ed84e99f1") {
-        changing = true
     }
 
     // If you wish to include a dependency in your jar use the "embed" method
@@ -81,11 +73,6 @@ dependencies {
 shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = [project.configurations.embed]
-}
-
-configurations.all {
-    // Check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
 }
 
 tasks.build.finalizedBy tasks.shadowJar

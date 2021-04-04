@@ -61,7 +61,10 @@ dependencies {
     compileOnly "com.google.code.gson:gson:2.8.6"
     compileOnly "com.github.MediaModMC:MediaMod:0ed84e99f1"
 
-    embed "com.github.jkcclemens:khttp:-SNAPSHOT"
+    embed("com.github.jkcclemens:khttp:-SNAPSHOT") {
+        exclude group: "org.jetbrains.kotlin"
+    }
+
     embed("com.github.dreamhopping:Kotify:main-SNAPSHOT") {
         exclude group: "org.jetbrains.kotlin"
     }

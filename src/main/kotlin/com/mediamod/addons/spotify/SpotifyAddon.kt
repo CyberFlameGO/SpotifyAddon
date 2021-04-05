@@ -24,6 +24,7 @@ import com.mediamod.core.addon.MediaModAddon
 import com.mediamod.core.config.MediaModConfigRegistry
 import com.mediamod.core.service.MediaModServiceRegistry
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 /**
  * The addon class for the Spotify Addon for MediaMod
@@ -31,8 +32,8 @@ import org.apache.logging.log4j.LogManager
  */
 class SpotifyAddon : MediaModAddon("mediamod-spotify") {
     companion object {
-        val logger = LogManager.getLogger("MediaMod: Spotify Integration")
-        val apiURL = "http://localhost:8080"
+        val logger: Logger = LogManager.getLogger("MediaMod: Spotify Integration")
+        const val apiURL = "http://localhost:8080"
     }
 
     /**

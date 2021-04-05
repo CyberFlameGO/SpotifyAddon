@@ -65,7 +65,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlin"
     }
 
-    embed("com.github.dreamhopping:Kotify:main-SNAPSHOT") {
+    embed("com.github.dreamhopping:Kotify:8055fa0") {
         exclude group: "org.jetbrains.kotlin"
     }
 

@@ -41,7 +41,7 @@ class SpotifyAddon : MediaModAddon("mediamod-spotify") {
      * The addon should be ready for usage when this method is complete
      */
     override fun initialise() {
-        MediaModServiceRegistry.registerService(identifier, SpotifyService())
         MediaModConfigRegistry.registerConfig(identifier, Configuration)
+        MediaModServiceRegistry.registerService(identifier, SpotifyService())
     }
 }

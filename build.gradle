@@ -59,7 +59,7 @@ configurations {
 dependencies {
     // Gson is included in Minecraft, the addon uses this for parsing responses from Spotify
     compileOnly "com.google.code.gson:gson:2.8.6"
-    compileOnly "com.github.MediaModMC:MediaMod:0ed84e99f1"
+    compileOnly "com.github.MediaModMC:MediaMod:492dfb0"
 
     embed("com.github.jkcclemens:khttp:-SNAPSHOT") {
         exclude group: "org.jetbrains.kotlin"

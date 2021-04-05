@@ -26,6 +26,7 @@ import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
 import dev.dreamhopping.kotify.api.authorization.flows.KotifyTokenResponse
 import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
+import dev.dreamhopping.kotify.builder.KotifyBuilder.Companion.credentials
 import dev.dreamhopping.kotify.kotify
 import khttp.post
 
@@ -35,6 +36,7 @@ import khttp.post
  */
 class SpotifyService : MediaModService("spotify-addon-service") {
     private var currentTrack: KotifyUserCurrentTrack? = null
+    private val gson = Gson()
     private val kotify = kotify {
         credentials {
             accessToken = Configuration.accessToken
@@ -50,14 +52,16 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * @return null if there is no TrackMetadata available
      */
     override fun fetchTrackMetadata(): TrackMetadata? {
-        val trackItem = currentTrack?.item ?: return null
+        val currentTrack = currentTrack ?: return null
+        val trackItem = currentTrack.item ?: return null
 
         return TrackMetadata(
             trackItem.name ?: "Unknown Track",
             trackItem.artists?.get(0)?.name ?: "Unknown Artist",
-            currentTrack?.progressMs ?: 0,
+            currentTrack.progressMs ?: 0,
             trackItem.durationMs ?: 0,
-            trackItem.album?.images?.get(0)?.url
+            trackItem.album?.images?.get(0)?.url,
+            !(currentTrack.isPlaying ?: true)
         )
     }
 
@@ -76,9 +80,7 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * Once this method is complete, your service needs to be ready to use
      */
     override fun initialise() {
-        ThreadingService.runAsync {
-            refreshAccessToken()
-        }
+        ThreadingService.runAsync(this::refreshAccessToken)
     }
 
     /**
@@ -86,18 +88,23 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * If a new refresh token wasn't provided the existing one is still valid
      */
     private fun refreshAccessToken() {
-        val refreshToken = Configuration.refreshToken
-        if (refreshToken.isEmpty()) return
+        val token = Configuration.refreshToken
+        if (token.isEmpty()) return
 
         try {
             val response =
-                post("${SpotifyAddon.apiURL}/api/v1/spotify/refresh", data = mapOf("refreshToken" to refreshToken))
+                post("${SpotifyAddon.apiURL}/api/v1/spotify/refresh", data = mapOf("refreshToken" to token))
 
             if (response.statusCode == 200) {
-                val tokenResponse = Gson().fromJson(response.text, KotifyTokenResponse::class.java)
+                val tokenResponse = gson.fromJson(response.text, KotifyTokenResponse::class.java)
 
                 Configuration.accessToken = tokenResponse.accessToken
-                Configuration.refreshToken = tokenResponse.refreshToken ?: refreshToken
+                Configuration.refreshToken = tokenResponse.refreshToken ?: token
+
+                kotify.credentials = credentials {
+                    accessToken = Configuration.accessToken
+                    refreshToken = Configuration.refreshToken
+                }
 
                 SpotifyAddon.logger.info("Successfully refreshed access token!")
             } else {

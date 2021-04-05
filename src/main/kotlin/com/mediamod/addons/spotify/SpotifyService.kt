@@ -19,15 +19,18 @@
 
 package com.mediamod.addons.spotify
 
+import com.google.gson.Gson
 import com.mediamod.addons.spotify.config.Configuration
+import com.mediamod.core.bindings.threading.ThreadingService
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
+import dev.dreamhopping.kotify.api.authorization.flows.KotifyTokenResponse
 import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
 import dev.dreamhopping.kotify.kotify
+import khttp.post
 
 /**
  * The service for the Spotify addon for MediaMod
- *
  * @author Conor Byrne (dreamhopping)
  */
 class SpotifyService : MediaModService("spotify-addon-service") {
@@ -73,6 +76,35 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * Once this method is complete, your service needs to be ready to use
      */
     override fun initialise() {
+        ThreadingService.runAsync {
+            refreshAccessToken()
+        }
+    }
 
+    /**
+     * Refreshes the user's access token via the MediaMod API
+     * If a new refresh token wasn't provided the existing one is still valid
+     */
+    private fun refreshAccessToken() {
+        val refreshToken = Configuration.refreshToken
+        if (refreshToken.isEmpty()) return
+
+        try {
+            val response =
+                post("${SpotifyAddon.apiURL}/api/v1/spotify/refresh", data = mapOf("refreshToken" to refreshToken))
+
+            if (response.statusCode == 200) {
+                val tokenResponse = Gson().fromJson(response.text, KotifyTokenResponse::class.java)
+
+                Configuration.accessToken = tokenResponse.accessToken
+                Configuration.refreshToken = tokenResponse.refreshToken ?: refreshToken
+
+                SpotifyAddon.logger.info("Successfully refreshed access token!")
+            } else {
+                SpotifyAddon.logger.error("Failed to refresh access token! (${response.statusCode}) Error: ${response.text}")
+            }
+        } catch (t: Throwable) {
+            SpotifyAddon.logger.error("Failed to refresh access token! Error:", t)
+        }
     }
 }

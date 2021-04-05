@@ -24,6 +24,7 @@ import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.bindings.threading.ThreadingService
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
+import dev.dreamhopping.kotify.Kotify
 import dev.dreamhopping.kotify.api.authorization.flows.KotifyTokenResponse
 import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
 import dev.dreamhopping.kotify.builder.KotifyBuilder.Companion.credentials
@@ -37,12 +38,13 @@ import khttp.post
 class SpotifyService : MediaModService("spotify-addon-service") {
     private var currentTrack: KotifyUserCurrentTrack? = null
     private val gson = Gson()
-    private val kotify = kotify {
-        credentials {
-            accessToken = Configuration.accessToken
-            refreshToken = Configuration.refreshToken
+    private val kotify: Kotify
+        get() = kotify {
+            credentials {
+                accessToken = Configuration.accessToken
+                refreshToken = Configuration.refreshToken
+            }
         }
-    }
 
     /**
      * Called when MediaMod wants to get a [TrackMetadata] instance from you
@@ -60,8 +62,7 @@ class SpotifyService : MediaModService("spotify-addon-service") {
             trackItem.artists?.get(0)?.name ?: "Unknown Artist",
             currentTrack.progressMs ?: 0,
             trackItem.durationMs ?: 0,
-            trackItem.album?.images?.get(0)?.url,
-            !(currentTrack.isPlaying ?: true)
+            trackItem.album?.images?.get(0)?.url
         )
     }
 

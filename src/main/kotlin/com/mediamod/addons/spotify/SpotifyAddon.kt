@@ -23,16 +23,22 @@ import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.addon.MediaModAddon
 import com.mediamod.core.config.MediaModConfigRegistry
 import com.mediamod.core.service.MediaModServiceRegistry
+import dev.cbyrne.kotify.api.authorization.flows.authorizationCodeFlow
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 /**
  * The addon class for the Spotify Addon for MediaMod
- * @author Conor Byrne (dreamhopping)
+ * @author Conor Byrne
  */
 class SpotifyAddon : MediaModAddon("mediamod-spotify") {
     companion object {
         val logger: Logger = LogManager.getLogger("MediaMod: Spotify Integration")
+        val authorizationFlow = authorizationCodeFlow {
+            clientID = "88ddf756462c4e078933a42f4cdb33e8"
+            redirectURI = "http://localhost:9103/callback"
+        }
+
         const val apiURL = "http://localhost:8080"
     }
 

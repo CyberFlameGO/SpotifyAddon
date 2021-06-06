@@ -1,10 +1,13 @@
 package com.mediamod.addons.spotify.config
 
-import club.sk1er.vigilance.Vigilant
-import club.sk1er.vigilance.data.Property
-import club.sk1er.vigilance.data.PropertyType
+import com.mediamod.addons.spotify.SpotifyAddon
 import com.mediamod.core.MediaModCore
+import gg.essential.vigilance.Vigilant
+import gg.essential.vigilance.data.Property
+import gg.essential.vigilance.data.PropertyType
+import java.awt.Desktop
 import java.io.File
+import java.net.URL
 
 object Configuration : Vigilant(
     File(MediaModCore.addonConfigDirectory, "mediamod-spotify.toml"),
@@ -16,6 +19,15 @@ object Configuration : Vigilant(
         category = "Authentication", subcategory = "General"
     )
     var autoRefresh: Boolean = true
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Login to Spotify",
+        description = "Opens a URL in your browser which allows you to authorize with Spotify.",
+        category = "Authentication", subcategory = "General"
+    )
+    fun login() {
+        Desktop.getDesktop().browse(URL(SpotifyAddon.authorizationFlow.authorizationURL).toURI())
+    }
 
     @Property(
         type = PropertyType.TEXT, name = "Access Token",

@@ -24,16 +24,16 @@ import com.mediamod.addons.spotify.config.Configuration
 import com.mediamod.core.bindings.threading.ThreadingService
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
-import dev.dreamhopping.kotify.Kotify
-import dev.dreamhopping.kotify.api.authorization.flows.KotifyTokenResponse
-import dev.dreamhopping.kotify.api.section.user.types.KotifyUserCurrentTrack
-import dev.dreamhopping.kotify.builder.KotifyBuilder.Companion.credentials
-import dev.dreamhopping.kotify.kotify
+import dev.cbyrne.kotify.Kotify
+import dev.cbyrne.kotify.api.authorization.flows.KotifyTokenResponse
+import dev.cbyrne.kotify.api.section.user.types.KotifyUserCurrentTrack
+import dev.cbyrne.kotify.builder.KotifyBuilder.Companion.credentials
+import dev.cbyrne.kotify.kotify
 import khttp.post
 
 /**
  * The service for the Spotify addon for MediaMod
- * @author Conor Byrne (dreamhopping)
+ * @author Conor Byrne
  */
 class SpotifyService : MediaModService("spotify-addon-service") {
     private var currentTrack: KotifyUserCurrentTrack? = null

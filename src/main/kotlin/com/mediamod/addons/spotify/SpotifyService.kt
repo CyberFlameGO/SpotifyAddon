@@ -21,23 +21,28 @@ package com.mediamod.addons.spotify
 
 import com.google.gson.Gson
 import com.mediamod.addons.spotify.config.Configuration
+import com.mediamod.addons.spotify.server.LocalServer
 import com.mediamod.core.bindings.threading.ThreadingService
 import com.mediamod.core.service.MediaModService
 import com.mediamod.core.track.TrackMetadata
 import dev.cbyrne.kotify.Kotify
 import dev.cbyrne.kotify.api.authorization.flows.KotifyTokenResponse
+import dev.cbyrne.kotify.api.section.error.KotifyAPIRequestException
 import dev.cbyrne.kotify.api.section.user.types.KotifyUserCurrentTrack
 import dev.cbyrne.kotify.builder.KotifyBuilder.Companion.credentials
 import dev.cbyrne.kotify.kotify
 import khttp.post
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * The service for the Spotify addon for MediaMod
  * @author Conor Byrne
  */
-class SpotifyService : MediaModService("spotify-addon-service") {
-    private var currentTrack: KotifyUserCurrentTrack? = null
+object SpotifyService : MediaModService("spotify-addon-service") {
     private val gson = Gson()
+    private val callbackServer = LocalServer()
+    private var currentTrack: KotifyUserCurrentTrack? = null
+
     private val kotify: Kotify
         get() = kotify {
             credentials {
@@ -71,7 +76,12 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * @return true if you are ready to return [TrackMetadata], otherwise false
      */
     override fun hasTrackMetadata(): Boolean {
-        currentTrack = kotify.api.user.fetchCurrentTrack()
+        currentTrack = try {
+            kotify.api.user.fetchCurrentTrack()
+        } catch (e: KotifyAPIRequestException) {
+            null
+        }
+
         return currentTrack?.isPlaying ?: false
     }
 
@@ -81,7 +91,34 @@ class SpotifyService : MediaModService("spotify-addon-service") {
      * Once this method is complete, your service needs to be ready to use
      */
     override fun initialise() {
-        ThreadingService.runAsync(this::refreshAccessToken)
+        ThreadingService.runAsync(callbackServer::start)
+
+        // 3300000ms = 55 minutes, the access token expires after an hour, but let's refresh it 5 minutes beforehand to
+        // be safe.
+        fixedRateTimer("Spotify API - Refresh", true, 0, 3300000) {
+            refreshAccessToken()
+        }
+    }
+
+    /**
+     * Gets an access and a refresh token for a Spotify API code via the MediaMod API
+     */
+    fun login(code: String) {
+        try {
+            val response =
+                post("${SpotifyAddon.apiURL}/api/v1/spotify/exchange?code=${code}")
+
+            if (response.statusCode == 200) {
+                val tokenResponse = gson.fromJson(response.text, KotifyTokenResponse::class.java)
+                refreshCredentials(tokenResponse.accessToken, tokenResponse.refreshToken ?: "")
+
+                SpotifyAddon.logger.info("Successfully logged in to Spotify!")
+            } else {
+                SpotifyAddon.logger.error("Failed to login! (${response.statusCode}) Error: ${response.text}")
+            }
+        } catch (t: Throwable) {
+            SpotifyAddon.logger.error("Failed to login! Error:", t)
+        }
     }
 
     /**
@@ -94,18 +131,11 @@ class SpotifyService : MediaModService("spotify-addon-service") {
 
         try {
             val response =
-                post("${SpotifyAddon.apiURL}/api/v1/spotify/refresh", data = mapOf("refreshToken" to token))
+                post("${SpotifyAddon.apiURL}/api/v1/spotify/refresh?refreshToken=${token}")
 
             if (response.statusCode == 200) {
                 val tokenResponse = gson.fromJson(response.text, KotifyTokenResponse::class.java)
-
-                Configuration.accessToken = tokenResponse.accessToken
-                Configuration.refreshToken = tokenResponse.refreshToken ?: token
-
-                kotify.credentials = credentials {
-                    accessToken = Configuration.accessToken
-                    refreshToken = Configuration.refreshToken
-                }
+                refreshCredentials(tokenResponse.accessToken, tokenResponse.refreshToken ?: token)
 
                 SpotifyAddon.logger.info("Successfully refreshed access token!")
             } else {
@@ -113,6 +143,16 @@ class SpotifyService : MediaModService("spotify-addon-service") {
             }
         } catch (t: Throwable) {
             SpotifyAddon.logger.error("Failed to refresh access token! Error:", t)
+        }
+    }
+
+    private fun refreshCredentials(accessToken: String, refreshToken: String) {
+        Configuration.accessToken = accessToken
+        Configuration.refreshToken = refreshToken
+
+        kotify.credentials = credentials {
+            this.accessToken = accessToken
+            this.refreshToken = refreshToken
         }
     }
 }

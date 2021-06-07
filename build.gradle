@@ -31,6 +31,7 @@ buildscript {
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.5.10"
     id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
@@ -60,8 +61,10 @@ configurations {
 dependencies {
     // Gson is included in Minecraft, the addon uses this for parsing responses from Spotify
     compileOnly "com.google.code.gson:gson:2.8.6"
-    compileOnly "com.github.MediaModMC.MediaMod:core:750a4716cd"
+    compileOnly "com.github.MediaModMC.MediaMod:core:03764de"
+    compileOnly "com.github.MediaModMC.MediaMod:forge-1.8.9:03764de"
     compileOnly "gg.essential:Vigilance:107-10809-SNAPSHOT"
+    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
 
     embed("com.github.jkcclemens:khttp:39f76b4") {
         exclude group: "org.jetbrains.kotlin"

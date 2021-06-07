@@ -24,6 +24,7 @@ import com.mediamod.core.addon.MediaModAddon
 import com.mediamod.core.config.MediaModConfigRegistry
 import com.mediamod.core.service.MediaModServiceRegistry
 import dev.cbyrne.kotify.api.authorization.flows.authorizationCodeFlow
+import dev.cbyrne.kotify.api.scopes.SpotifyScope
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -37,9 +38,14 @@ class SpotifyAddon : MediaModAddon("mediamod-spotify") {
         val authorizationFlow = authorizationCodeFlow {
             clientID = "88ddf756462c4e078933a42f4cdb33e8"
             redirectURI = "http://localhost:9103/callback"
+            scopes {
+                +SpotifyScope.USER_READ_PLAYBACK_POSITION
+                +SpotifyScope.USER_READ_PLAYBACK_STATE
+                +SpotifyScope.USER_READ_CURRENTLY_PLAYING
+            }
         }
 
-        const val apiURL = "http://localhost:8080"
+        const val apiURL = "http://localhost:3001"
     }
 
     /**
@@ -48,6 +54,6 @@ class SpotifyAddon : MediaModAddon("mediamod-spotify") {
      */
     override fun initialise() {
         MediaModConfigRegistry.registerConfig(identifier, Configuration)
-        MediaModServiceRegistry.registerService(identifier, SpotifyService())
+        MediaModServiceRegistry.registerService(identifier, SpotifyService)
     }
 }
